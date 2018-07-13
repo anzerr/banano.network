@@ -1,0 +1,23 @@
+{
+  "name": "banano.node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anzerr/banano.node.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anzerr/banano.node/issues"
+  },
+  "homepage": "https://github.com/anzerr/banano.node#readme",
+  "dependencies": {
+    "banano.parser": "git+https://github.com/anzerr/banano.parser.git"
+  }
+}
