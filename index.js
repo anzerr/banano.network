@@ -38,7 +38,8 @@ class Client extends events {
 	}
 
 	send(data) {
-		return this.peer.send(new packet.Json(data).toBuffer().get());
+		console.log('send', data, new packet.Json(data).toBuffer().get());
+		return this.peer.udp(new packet.Json(data).toBuffer().get());
 	}
 
 	keepAlive() {

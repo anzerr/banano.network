@@ -1,6 +1,7 @@
 'use strict';
 
-const url = require('url'),
+const net = require('net'),
+	url = require('url'),
 	dns = require('dns'),
 	config = require('./config.js');
 
@@ -15,7 +16,7 @@ class Peer {
 				this._address.hostname = add;
 			}
 		});
-		this.ping = new Date().getTime() + config.aliveTime;
+		this.alive = new Date().getTime() + config.aliveTime;
 		this._score = score || 0;
 	}
 
@@ -27,16 +28,40 @@ class Peer {
 	}
 
 	score(n) {
-		this.ping = new Date().getTime() + config.aliveTime;
+		this.alive = new Date().getTime() + config.aliveTime;
 		this._score += n;
 		return this;
 	}
 
-	send(buf) {
+	udp(buf) {
 		return new Promise((resolve) => {
 			this._client.send(buf, this._address.port, this._address.hostname, (res) => {
 				resolve(res);
 			});
+		});
+	}
+
+	tcp(buf) {
+		return new Promise((resolve) => {
+			let socket = net.createConnection(this._address.port, this._address.hostname, () => {
+				socket.write(buf);
+			});
+
+			let data = [], done = false, cd = () => {
+				if (!done) {
+					done = true;
+					socket.destroy();
+					resolve(Buffer.concat(data));
+				}
+			};
+			socket.on('data', (packet) => {
+				data.push(packet);
+
+				if (packet.slice(packet.length - 64, packet.length).equals(config.endPacket)) {
+					socket.end();
+				}
+			}).on('error', cd).on('end', cd).on('timeout', cd);
+			socket.setTimeout(3000);
 		});
 	}
 

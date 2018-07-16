@@ -28,8 +28,8 @@ class PeerManger {
 			return this;
 		}
 		let now = new Date().getTime();
-		if (this._peer[p].ping < now) {
-			this._peer[p].ping = now + config.aliveTime * 0.25;
+		if (this._peer[p].alive < now) {
+			this._peer[p].alive = now + config.aliveTime * 0.25;
 		}
 		return this;
 	}
@@ -41,7 +41,7 @@ class PeerManger {
 	list(raw) {
 		let o = [], now = new Date().getTime();
 		for (let i in this._peer) {
-			if (this._peer[i].ping > now) {
+			if (this._peer[i].alive > now) {
 				o.push(this._peer[i].get());
 			}
 		}
@@ -56,14 +56,37 @@ class PeerManger {
 		return o;
 	}
 
-	send(buf) {
+	udp(buf) {
 		let wait = [], now = new Date().getTime();
 		for (let i in this._peer) {
-			if (this._peer[i].ping > now) {
-				wait.push(this._peer[i].send(buf));
+			if (this._peer[i].alive > now) {
+				wait.push(this._peer[i].udp(buf));
 			}
 		}
 		return Promise.all(wait);
+	}
+
+	tcp(buf) {
+		let list = [], res = [], run = () => {
+			let wait = [], l = list.splice(0, 10);
+			console.log(l);
+			if (l.length === 0) {
+				return res;
+			}
+			for (let i in l) {
+				wait.push(this._peer[l[i]].tcp(buf));
+			}
+			return Promise.all(wait).then((r) => {
+				console.log(r);
+				res = res.concat(r);
+				return run();
+			});
+		};
+		for (let i in this._peer) {
+			list.push(i);
+		}
+		console.log(list);
+		return run();
 	}
 
 }

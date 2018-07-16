@@ -6,7 +6,7 @@
     "scripts": {
         "test": "node example.js",
         "example": "node example.js",
-		"commit": "git add . && git commit -m \"fast save\" && git push origin master"
+        "commit": "git add . && git commit -m \"fast save\" && git push origin master"
     },
     "repository": {
         "type": "git",
