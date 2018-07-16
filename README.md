@@ -1,6 +1,6 @@
 
 ### `Intro`
-A simple banano node you can interface with to build network triggerd services
+A object to interface with the banano network with nodejs event system.
 
 ### `TODO`
 still a Poc for the moment

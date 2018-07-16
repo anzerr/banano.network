@@ -1,23 +1,25 @@
 {
-  "name": "banano.node",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anzerr/banano.node.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/anzerr/banano.node/issues"
-  },
-  "homepage": "https://github.com/anzerr/banano.node#readme",
-  "dependencies": {
-    "banano.parser": "git+https://github.com/anzerr/banano.parser.git"
-  }
+    "name": "banano.network",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node example.js",
+        "example": "node example.js",
+		"commit": "git add . && git commit -m \"fast save\" && git push origin master"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/anzerr/banano.network.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/anzerr/banano.network/issues"
+    },
+    "homepage": "https://github.com/anzerr/banano.network#readme",
+    "dependencies": {
+        "banano.parser": "git+https://github.com/anzerr/banano.parser.git"
+    }
 }

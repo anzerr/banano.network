@@ -1,10 +1,9 @@
 'use strict';
 
-
-const packet = require('banano.parser');
-
-const events = require('events'),
-	dgram = require('dgram');
+const packet = require('banano.parser'),
+	events = require('events'),
+	dgram = require('dgram'),
+	PeerManger = require('./src/PeerManger.js');
 
 class Client extends events {
 
@@ -12,47 +11,51 @@ class Client extends events {
 		super();
 
 		this.config = config || {};
-		this.peer = config.peer;
 
 		this.client = dgram.createSocket('udp4');
 		this.client.on('error', (error) => {
-			console.log('error', error);
+			this.emit('error', error);
 		}).on('message', (message, rinfo) => {
-			console.log('message', message, rinfo);
-			let p = new packet.Buffer(message).toJson().get();
-			console.log(p);
-			console.log(message.toString('hex'));
+			try {
+				this.peer.score(rinfo.address + ':' + rinfo.port);
+				let p = new packet.Buffer(message).toJson().get();
+				if (p.type === 'keepAlive') {
+					for (let i in p.body) {
+						this.peer.add(p.body[i]);
+					}
+				}
+				this.emit('all', p);
+				this.emit(p.type, p);
+			} catch (e) {
+				this.emit('error', e);
+			}
 		}).on('listening', () => {
-			console.log('ready');
+			this.emit('ready');
 		});
 
+		this.peer = new PeerManger(this.client, config.peer || []);
 		this.client.bind(this.config.port);
 	}
 
-	publish(data) {
-		let b = new packet.Json(data).toBuffer(), p = b.get();
-		console.log(b.toJson().get());
-		for (let i in this.peer) {
-			const t = this.peer[i].split(':');
-			console.log('sent', t);
-			this.client.send(p, t[1], t[0], (error) => {
-				console.log(error);
-			});
+	send(data) {
+		return this.peer.send(new packet.Json(data).toBuffer().get());
+	}
+
+	keepAlive() {
+		let list = this.peer.list(), top = list.slice(0, 4), got = {};
+		for (let i = 0; i < 16; i++) {
+			let n = Math.floor(Math.random() * (list.length - 4)) + 4, l = list[n];
+			if (l && !got[n]) {
+				top.push(l);
+				got[n] = true;
+			}
+			if (top.length >= 8) {
+				break;
+			}
 		}
+		this.send({type: 'keepAlive', body: top.splice(0, 8)});
 	}
 
 }
 
-const c = new Client({
-	maxPeers: 200,
-	peer: [
-		'tarzan.banano.co.in:7071'
-	],
-	cache: 'cache!peer.json'
-});
-
-
-c.publish({type: 'keepAlive'});
-setInterval(() => {
-	c.publish({type: 'keepAlive'});
-}, 5000);
+module.exports = Client;
