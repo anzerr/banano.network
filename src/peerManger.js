@@ -1,18 +1,19 @@
 'use strict';
 
-const Peer = require('./Peer.js'),
-	config = require('./config.js');
+const Peer = require('./Peer.js');
 
 class PeerManger {
 
-	constructor(client, p) {
-		if (!Array.isArray(p)) {
+	constructor(client, config) {
+		this.config = config;
+		let peers = this.config.get('peer');
+		if (!Array.isArray(peers)) {
 			throw new Error('peer list is not a array');
 		}
 		this._client = client;
 		this._peer = {};
-		for (let i in p) {
-			this.add(p[i]);
+		for (let i in peers) {
+			this.add(peers[i]);
 		}
 	}
 
@@ -24,12 +25,12 @@ class PeerManger {
 
 	add(p) {
 		if (!this._peer[p]) {
-			this._peer[p] = new Peer(this._client, p);
+			this._peer[p] = new Peer(this._client, p, this.config);
 			return this;
 		}
 		let now = new Date().getTime();
 		if (this._peer[p].alive < now) {
-			this._peer[p].alive = now + config.aliveTime * 0.25;
+			this._peer[p].alive = now + this.config.get('aliveTime') * 0.25;
 		}
 		return this;
 	}
@@ -67,25 +68,30 @@ class PeerManger {
 	}
 
 	tcp(buf) {
-		let list = [], res = [], run = () => {
-			let wait = [], l = list.splice(0, 10);
-			console.log(l);
+		let list = [], res = {}, run = () => {
+			let wait = [], l = list.splice(0, this.config.get('tcpCap'));
 			if (l.length === 0) {
 				return res;
 			}
 			for (let i in l) {
-				wait.push(this._peer[l[i]].tcp(buf));
+				((ip) => {
+					wait.push(this._peer[l[i]].tcp(buf).then((r) => {
+						return {[ip]: r};
+					}));
+				})(l[i]);
 			}
 			return Promise.all(wait).then((r) => {
-				console.log(r);
-				res = res.concat(r);
+				for (let i in r) {
+					for (let x in r[i]) {
+						res[x] = r[i][x];
+					}
+				}
 				return run();
 			});
 		};
 		for (let i in this._peer) {
 			list.push(i);
 		}
-		console.log(list);
 		return run();
 	}
 

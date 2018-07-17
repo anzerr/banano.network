@@ -1,6 +1,22 @@
 'use strict';
 
-module.exports = {
-	aliveTime: 60 * 1000 * 5,
-	endPacket: Buffer.alloc(64)
-};
+class Config {
+
+	constructor(config) {
+		this._config = {
+			aliveTime: 60 * 1000 * 5,
+			tcpTimeout: 3000,
+			tcpCap: 10
+		};
+		for (let i in config) {
+			this._config[i] = config[i];
+		}
+	}
+
+	get(key) {
+		return this._config[key];
+	}
+
+}
+
+module.exports = Config;

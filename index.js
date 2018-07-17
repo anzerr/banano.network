@@ -3,14 +3,15 @@
 const packet = require('banano.parser'),
 	events = require('events'),
 	dgram = require('dgram'),
+	Config = require('./src/Config.js'),
 	PeerManger = require('./src/PeerManger.js');
 
 class Client extends events {
 
-	constructor(config) {
+	constructor(c) {
 		super();
 
-		this.config = config || {};
+		this.config = new Config(c || {});
 
 		this.client = dgram.createSocket('udp4');
 		this.client.on('error', (error) => {
@@ -33,8 +34,8 @@ class Client extends events {
 			this.emit('ready');
 		});
 
-		this.peer = new PeerManger(this.client, config.peer || []);
-		this.client.bind(this.config.port);
+		this.peer = new PeerManger(this.client, this.config);
+		this.client.bind(this.config.get('port'));
 	}
 
 	send(data) {
