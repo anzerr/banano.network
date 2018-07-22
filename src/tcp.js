@@ -1,29 +1,32 @@
 'use strict';
 
 const net = require('net'),
-	packet = require('banano.parser');
+	{util} = require('banano.parser');
 
 const type = {
 	frontierReq: require('./tcp/frontierReq.js'),
+	bulkPull: require('./tcp/bulkPull.js')
 };
 
 class Tcp {
 
-	constructor(buf, address, config) {
-		this._buf = buf;
-		this._address = address;
-		this._type = packet.util.packetType(buf);
-		this.config = config;
+	constructor(host, port) {
+		this._address = {host, port};
 	}
 
-	get() {
-		let Handle = type[this._type];
+	withConfig(config) {
+		this.config = config;
+		return this;
+	}
+
+	get(buf) {
+		let Handle = type[util.packetType(buf)];
 		if (!Handle) {
 			return Promise.reject(new Error('type is not handled'));
 		}
 		return new Promise((resolve) => {
 			let socket = net.createConnection(this._address.port, this._address.host, () => {
-				socket.write(this._buf);
+				socket.write(buf);
 			});
 
 			let data = new Handle(socket), done = false, cd = () => {

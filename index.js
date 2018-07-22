@@ -1,6 +1,6 @@
 'use strict';
 
-const packet = require('banano.parser'),
+const {packet} = require('banano.parser'),
 	events = require('events'),
 	dgram = require('dgram'),
 	Config = require('./src/Config.js'),
@@ -21,8 +21,8 @@ class Client extends events {
 				this.peer.score(rinfo.address + ':' + rinfo.port);
 				let p = new packet.Buffer(message).toJson().get();
 				if (p.type === 'keepAlive') {
-					for (let i in p.body) {
-						this.peer.add(p.body[i]);
+					for (let i in p.peer) {
+						this.peer.add(p.peer[i]);
 					}
 				}
 				this.emit('all', p);
@@ -34,12 +34,15 @@ class Client extends events {
 			this.emit('ready');
 		});
 
-		this.peer = new PeerManger(this.client, this.config);
+		this.peer = new PeerManger()
+			.withClient(this.client)
+			.withConfig(this.config)
+			.init();
+
 		this.client.bind(this.config.get('port'));
 	}
 
 	send(data) {
-		console.log('send', data, new packet.Json(data).toBuffer().get());
 		return this.peer.udp(new packet.Json(data).toBuffer().get());
 	}
 
@@ -55,7 +58,7 @@ class Client extends events {
 				break;
 			}
 		}
-		this.send({type: 'keepAlive', body: top.splice(0, 8)});
+		this.send({type: 'keepAlive', peer: top.splice(0, 8)});
 	}
 
 }

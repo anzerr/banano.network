@@ -1,20 +1,32 @@
 'use strict';
 
-const Peer = require('./Peer.js');
+const Peer = require('./Peer.js'),
+	util = require('./util.js');
 
 class PeerManger {
 
-	constructor(client, config) {
+	constructor() {}
+
+	withConfig(config) {
 		this.config = config;
+		return this;
+	}
+
+	withClient(client) {
+		this.client = client;
+		return this;
+	}
+
+	init() {
 		let peers = this.config.get('peer');
 		if (!Array.isArray(peers)) {
 			throw new Error('peer list is not a array');
 		}
-		this._client = client;
 		this._peer = {};
 		for (let i in peers) {
 			this.add(peers[i]);
 		}
+		return this;
 	}
 
 	score(p) {
@@ -25,10 +37,13 @@ class PeerManger {
 
 	add(p) {
 		if (!this._peer[p]) {
-			this._peer[p] = new Peer(this._client, p, this.config);
+			this._peer[p] = new Peer(p)
+				.withClient(this.client)
+				.withConfig(this.config)
+				.init();
 			return this;
 		}
-		let now = new Date().getTime();
+		let now = util.now();
 		if (this._peer[p].alive < now) {
 			this._peer[p].alive = now + this.config.get('aliveTime') * 0.25;
 		}
@@ -39,13 +54,21 @@ class PeerManger {
 		return this._peer[p];
 	}
 
-	list(raw) {
-		let o = [], now = new Date().getTime();
+	forEach(func) {
+		let now = util.now();
 		for (let i in this._peer) {
 			if (this._peer[i].alive > now) {
-				o.push(this._peer[i].get());
+				func(this._peer[i], i);
 			}
 		}
+		return this;
+	}
+
+	list(raw) {
+		let o = [];
+		this.forEach((p) => {
+			o.push(p.get());
+		});
 		o.sort((a, b) => {
 			return b.score - a.score;
 		});
@@ -58,12 +81,10 @@ class PeerManger {
 	}
 
 	udp(buf) {
-		let wait = [], now = new Date().getTime();
-		for (let i in this._peer) {
-			if (this._peer[i].alive > now) {
-				wait.push(this._peer[i].udp(buf));
-			}
-		}
+		let wait = [];
+		this.forEach((p) => {
+			wait.push(p.udp(buf));
+		});
 		return Promise.all(wait);
 	}
 
@@ -89,9 +110,9 @@ class PeerManger {
 				return run();
 			});
 		};
-		for (let i in this._peer) {
-			list.push(i);
-		}
+		this.forEach((p, k) => {
+			list.push(k);
+		});
 		return run();
 	}
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const packet = require('banano.parser'),
+const {packet} = require('banano.parser'),
 	account = require('banano.account');
 
 const Client = require('./index.js');
@@ -9,11 +9,11 @@ const c = new Client({
 	peer: ['tarzan.banano.co.in:7071']
 }).on('publish', (/* packet*/) => { // get only publish pacekts
 	// console.log(packet);
-}).on('all', (packet) => { // get all packet types
+}).on('all', (/* packet*/) => { // get all packet types
 	/* if (packet.type !== 'confirmReq' && packet.type !== 'keepAlive' && packet.type !== 'confirmAck') {
 		console.log('get', packet);
 	}*/
-}).on('error', (err) => {
+}).on('error', (/* err*/) => {
 	// console.log(err);
 }).on('ready', () => {
 	console.log('ready');

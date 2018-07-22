@@ -145,7 +145,7 @@ module.exports = exports = {
         "no-dupe-class-members": ERROR,
         "no-this-before-super": ERROR,
         "no-var": WARN,
-        "object-shorthand": [ WARN, "never" ],
+        "object-shorthand": [ OFF, "never" ],
         "prefer-arrow-callback": WARN,
         "prefer-spread": WARN,
         "prefer-template": OFF,
