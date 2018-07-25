@@ -8,39 +8,37 @@ const type = {
 	bulkPull: require('./tcp/bulkPull.js')
 };
 
-class Tcp {
+class Tcp extends require('./base.js') {
 
 	constructor(host, port) {
+		super();
 		this._address = {host, port};
-	}
-
-	withConfig(config) {
-		this.config = config;
-		return this;
 	}
 
 	get(buf) {
 		let Handle = type[util.packetType(buf)];
 		if (!Handle) {
-			return Promise.reject(new Error('type is not handled'));
+			throw new Error('type is not handled');
 		}
-		return new Promise((resolve) => {
-			let socket = net.createConnection(this._address.port, this._address.host, () => {
-				socket.write(buf);
-			});
-
-			let data = new Handle(socket), done = false, cd = () => {
-				if (!done) {
-					done = true;
-					socket.destroy();
-					resolve(data.json());
-				}
-			};
-			socket.on('data', (d) => {
-				data.push(d);
-			}).on('error', cd).on('end', cd).on('timeout', cd);
-			socket.setTimeout(this.config.get('tcpTimeout'));
+		let socket = net.createConnection(this._address.port, this._address.host, () => {
+			console.log(buf);
+			socket.write(buf);
 		});
+
+		let data = new Handle(socket)
+			.withConfig(this.config);
+
+		let close = () => {
+			data.destroy();
+		};
+		socket.on('data', (packet) => {
+			data.push(packet);
+		}).on('error', close)
+			.on('end', close)
+			.on('timeout', close)
+			.setTimeout(this.config.get('tcpTimeout'));
+
+		return data;
 	}
 
 }

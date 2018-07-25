@@ -3,13 +3,10 @@
 const Peer = require('./Peer.js'),
 	util = require('./util.js');
 
-class PeerManger {
+class PeerManger extends require('./base.js') {
 
-	constructor() {}
-
-	withConfig(config) {
-		this.config = config;
-		return this;
+	constructor() {
+		super();
 	}
 
 	withClient(client) {
@@ -31,12 +28,14 @@ class PeerManger {
 
 	score(p) {
 		if (this._peer[p]) {
+			this.log(7, 'peer', p, 'add score');
 			this._peer[p].score(1);
 		}
 	}
 
 	add(p) {
 		if (!this._peer[p]) {
+			this.log(6, 'added peer', p);
 			this._peer[p] = new Peer(p)
 				.withClient(this.client)
 				.withConfig(this.config)
@@ -83,22 +82,32 @@ class PeerManger {
 	udp(buf) {
 		let wait = [];
 		this.forEach((p) => {
+			this.log(7, 'sent packet to', p.address(), 'type', buf[5]);
 			wait.push(p.udp(buf));
 		});
 		return Promise.all(wait);
 	}
 
-	tcp(buf) {
-		let list = [], res = {}, run = () => {
-			let wait = [], l = list.splice(0, this.config.get('tcpCap'));
+	tcp(buf, options) {
+		let list = [], res = {}, called = 0, run = () => {
+			let wait = [], l = list.splice(0, options.tcpSlice || this.config.get('tcpSlice')), end = false;
 			if (l.length === 0) {
 				return res;
 			}
 			for (let i in l) {
 				((ip) => {
+					if (options.callCap && called >= options.callCap) {
+						return; // skip
+					}
+					this.log(8, 'open stream to', l[i], 'as callie', called);
 					wait.push(this._peer[l[i]].tcp(buf).then((r) => {
+						if (options.utilResponse && r.length !== 0) {
+							end = true;
+						}
+						this.log(7, 'stream response length for', ip, 'is', r.length);
 						return {[ip]: r};
 					}));
+					called += 1;
 				})(l[i]);
 			}
 			return Promise.all(wait).then((r) => {
@@ -107,12 +116,21 @@ class PeerManger {
 						res[x] = r[i][x];
 					}
 				}
+				if (end || (options.callCap && called >= options.callCap)) {
+					return res;
+				}
 				return run();
 			});
 		};
 		this.forEach((p, k) => {
 			list.push(k);
 		});
+		if (options.random) {
+			this.log(9, 'shuffled the peers');
+			list.sort(() => {
+				return Math.random() * 2 - 1;
+			});
+		}
 		return run();
 	}
 

@@ -1,33 +1,38 @@
 'use strict';
 
-const socketEnd = Buffer.alloc(64);
+const {packet, util} = require('banano.parser');
 
-class frontierReq {
+class frontierReq extends require('./base.js') {
 
 	constructor(socket) {
+		super();
 		this._socket = socket;
 		this._data = null;
+		this._end = false;
 	}
 
-	push(packet) {
-		this._data = !this._data ? packet : Buffer.concat([this._data, packet]);
-		if (this._data.slice(this._data.length - 64, this._data.length).equals(socketEnd)) {
-			this._socket.end();
-		}
-		return this;
-	}
-
-	json() {
-		let out = [], payload = this._data, zeroed = Buffer.alloc(32);
-		for (let i = 0; i < payload.length; i += 64) {
-			let account = payload.slice(i, i + 32), hash = payload.slice(i + 32, i + 64);
-			if (account.equals(zeroed) && hash.equals(zeroed)) {
+	push(p) {
+		this._data = !this._data ? p : Buffer.concat([this._data, p]);
+		let i = 0;
+		while (i < this._data.length) {
+			let type = this._data[i];
+			if (util.blockType(type) === 'notBlock') {
+				this.destroy();
 				break;
-			} else if (account.length === 32 && hash.length === 32) {
-				out.push({account: account.toString('hex'), hash: hash.toString('hex')});
+			} else {
+				let size = util.getBlockSize(this._data[i]) + 1, buf = Buffer.concat([
+					util.createHeader({type: 'publish', extensions: type}),
+					this._data.slice(i + 1, i + size)
+				]);
+				let out = new packet.Buffer(buf, {skipValidation: true}).toJson().get();
+				if (out && out.block) {
+					this.emit('data', out.block);
+				}
+				i += size;
 			}
 		}
-		return out;
+		this._data = this._data.slice(i, this._data.length);
+		return this;
 	}
 
 }
