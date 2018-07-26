@@ -1,5 +1,5 @@
 
-### `Intro`
+## `Intro`
 A object to interface with the banano network with NodeJS event system.
 
 ### `State`
@@ -21,7 +21,7 @@ Usable in its current state see example for ways to use it.
 | Frontier Req          | ✓    |
 | Bulk Pull Blocks      | ✓    |
 
-## `weird stuff`
+## `Weird stuff`
 
 #### `Frontier Req`
 Has a count value that has no effect on how many entries that are streamed back.
