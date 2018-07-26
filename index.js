@@ -12,11 +12,11 @@ class Client extends events {
 		super();
 
 		this.config = new Config(c || {});
+		this.client = dgram.createSocket('udp4');
 		this.peer = new PeerManger()
 			.withClient(this.client)
 			.withConfig(this.config);
 
-		this.client = dgram.createSocket('udp4');
 		this.client.on('error', (error) => {
 			this.emit('error', error);
 		}).on('message', (message, rinfo) => {
@@ -37,8 +37,8 @@ class Client extends events {
 				this.emit(p.type, p, who);
 			}
 		}).on('listening', () => {
-			this.emit('ready');
 			this.peer.init();
+			this.emit('ready');
 		});
 
 		this.client.bind(this.config.get('port'));
