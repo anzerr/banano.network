@@ -1,6 +1,7 @@
 'use strict';
 
-const Peer = require('./Peer.js'),
+const {packet} = require('banano.parser'),
+	Peer = require('./Peer.js'),
 	util = require('./util.js');
 
 class PeerManger extends require('./base.js') {
@@ -41,7 +42,10 @@ class PeerManger extends require('./base.js') {
 				.withConfig(this.config)
 				.init();
 			if (this.config.get('aliveOnAdd')) {
-				this._peer[p].udp({type: 'keepAlive', peer: this.getTop(8)});
+				this._peer[p].udp(new packet.Json({
+					type: 'keepAlive',
+					peer: this.getTop(8)
+				}).toBuffer().get());
 			}
 			return this;
 		}
