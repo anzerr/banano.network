@@ -4,8 +4,6 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "node example.js",
-        "example": "node example.js",
         "init": "rm -Rf node_modules package-lock.json && npm i",
         "commit": "git add . && git commit -m \"fast save\" && git push origin master"
     },

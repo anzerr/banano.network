@@ -8,7 +8,7 @@ class Config {
 			tcpTimeout: 3000,
 			tcpSlice: 10,
 			dnsLoopup: false,
-			log: 10
+			log: 0
 		};
 		for (let i in config) {
 			this._config[i] = config[i];

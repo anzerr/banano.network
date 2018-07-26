@@ -5,7 +5,8 @@ const net = require('net'),
 
 const type = {
 	frontierReq: require('./tcp/frontierReq.js'),
-	bulkPull: require('./tcp/bulkPull.js')
+	bulkPull: require('./tcp/bulkPull.js'),
+	bulkPullBlocks: require('./tcp/bulkPullBlocks.js')
 };
 
 class Tcp extends require('./base.js') {
@@ -21,7 +22,6 @@ class Tcp extends require('./base.js') {
 			throw new Error('type is not handled');
 		}
 		let socket = net.createConnection(this._address.port, this._address.host, () => {
-			console.log(buf);
 			socket.write(buf);
 		});
 

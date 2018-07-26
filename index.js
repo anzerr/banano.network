@@ -4,7 +4,6 @@ const {packet} = require('banano.parser'),
 	events = require('events'),
 	dgram = require('dgram'),
 	Config = require('./src/Config.js'),
-	util = require('./src/util.js'),
 	PeerManger = require('./src/PeerManger.js');
 
 class Client extends events {
@@ -48,6 +47,18 @@ class Client extends events {
 
 	send(data) {
 		return this.peer.udp(new packet.Json(data).toBuffer().get());
+	}
+
+	close() {
+		if (this.client) {
+			return new Promise((resolve) => {
+				this.client.close(() => {
+					this.client = null;
+					resolve();
+				});
+			});
+		}
+		return Promise.resolve();
 	}
 
 	keepAlive() {

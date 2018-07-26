@@ -1,9 +1,9 @@
 
 ### `Intro`
-A object to interface with the banano network with nodejs event system.
+A object to interface with the banano network with NodeJS event system.
 
 ### `State`
-still a Poc for the moment
+Usable in its current state see example for ways to use it.
 
 ### `Udp support`
 | Name             | Done |
@@ -16,12 +16,20 @@ still a Poc for the moment
 ### `TCP support`
 | Name                  | Done |
 | :-------------------- | :--- |
-| Bulk Pull             | ✗    |
+| Bulk Pull             | ✓    |
 | Bulk Push             | ✗    |
 | Frontier Req          | ✓    |
-| Bulk Pull Blocks      | ✗    |
+| Bulk Pull Blocks      | ✓    |
 
-### `TODO`
-- change the config system to be injected
-- finish support for all tcp requests
-- create a object that simplifies the network client into simple action and events
+## `weird stuff`
+
+#### `Frontier Req`
+Has a count value that has no effect on how many entries that are streamed back.
+The age is in seconds and is how long ago that frontier was modified on that node.
+
+#### `Bulk Pull Blocks`
+This will always respond with an invalid block ending the stream. This is not currently working or implemented?
+in the version of the nodes I've tested.
+
+#### `Bulk pull`
+This will be added later after for the moment I've not dug into the project to understand how it's used.
