@@ -8,6 +8,7 @@ class Config {
 			tcpTimeout: 3000,
 			tcpSlice: 10,
 			dnsLoopup: false,
+			aliveOnAdd: false,
 			log: 0
 		};
 		for (let i in config) {

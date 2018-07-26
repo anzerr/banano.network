@@ -62,18 +62,7 @@ class Client extends events {
 	}
 
 	keepAlive() {
-		let list = this.peer.list(), top = list.slice(0, 4), got = {};
-		for (let i = 0; i < 16; i++) {
-			let n = Math.floor(Math.random() * (list.length - 4)) + 4, l = list[n];
-			if (l && !got[n]) {
-				top.push(l);
-				got[n] = true;
-			}
-			if (top.length >= 8) {
-				break;
-			}
-		}
-		this.send({type: 'keepAlive', peer: top.splice(0, 8)});
+		this.send({type: 'keepAlive', peer: this.peer.getTop(8)});
 	}
 
 }

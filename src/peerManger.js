@@ -40,6 +40,9 @@ class PeerManger extends require('./base.js') {
 				.withClient(this.client)
 				.withConfig(this.config)
 				.init();
+			if (this.config.get('aliveOnAdd')) {
+				this._peer[p].udp({type: 'keepAlive', peer: this.getTop(8)});
+			}
 			return this;
 		}
 		let now = util.now();
@@ -79,6 +82,22 @@ class PeerManger extends require('./base.js') {
 		return o;
 	}
 
+	getTop(c) {
+		let cap = c || 8, hcap = Math.floor(cap / 2);
+		let list = this.peer.list(), top = list.slice(0, hcap), got = {};
+		for (let i = 0; i < (cap * 2); i++) {
+			let n = Math.floor(Math.random() * (list.length - hcap)) + hcap, l = list[n];
+			if (l && !got[n]) {
+				top.push(l);
+				got[n] = true;
+			}
+			if (top.length >= cap) {
+				break;
+			}
+		}
+		return top.splice(0, cap);
+	}
+
 	udp(buf) {
 		let wait = [];
 		this.forEach((p) => {
@@ -86,52 +105,6 @@ class PeerManger extends require('./base.js') {
 			wait.push(p.udp(buf));
 		});
 		return Promise.all(wait);
-	}
-
-	tcp(buf, options) {
-		let list = [], res = {}, called = 0, run = () => {
-			let wait = [], l = list.splice(0, options.tcpSlice || this.config.get('tcpSlice')), end = false;
-			if (l.length === 0) {
-				return res;
-			}
-			for (let i in l) {
-				((ip) => {
-					if (options.callCap && called >= options.callCap) {
-						return; // skip
-					}
-					this.log(8, 'open stream to', l[i], 'as callie', called);
-					wait.push(this._peer[l[i]].tcp(buf).then((r) => {
-						if (options.utilResponse && r.length !== 0) {
-							end = true;
-						}
-						this.log(7, 'stream response length for', ip, 'is', r.length);
-						return {[ip]: r};
-					}));
-					called += 1;
-				})(l[i]);
-			}
-			return Promise.all(wait).then((r) => {
-				for (let i in r) {
-					for (let x in r[i]) {
-						res[x] = r[i][x];
-					}
-				}
-				if (end || (options.callCap && called >= options.callCap)) {
-					return res;
-				}
-				return run();
-			});
-		};
-		this.forEach((p, k) => {
-			list.push(k);
-		});
-		if (options.random) {
-			this.log(9, 'shuffled the peers');
-			list.sort(() => {
-				return Math.random() * 2 - 1;
-			});
-		}
-		return run();
 	}
 
 }
