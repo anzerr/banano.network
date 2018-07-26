@@ -23,7 +23,9 @@ class Client extends events {
 			let who = rinfo.address + ':' + rinfo.port, p = null;
 			try {
 				this.peer.score(who);
-				p = new packet.Buffer(message).toJson().get();
+				p = new packet.Buffer(message, {
+					skipValidation: this.config.get('skipBlockValidation')
+				}).toJson().get();
 				if (p.type === 'keepAlive') {
 					for (let i in p.peer) {
 						this.peer.add(p.peer[i]);

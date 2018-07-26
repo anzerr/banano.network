@@ -9,6 +9,7 @@ class Config {
 			tcpSlice: 10,
 			dnsLoopup: false,
 			aliveOnAdd: false,
+			skipBlockValidation: false,
 			log: 0
 		};
 		for (let i in config) {
