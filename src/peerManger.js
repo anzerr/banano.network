@@ -84,7 +84,7 @@ class PeerManger extends require('./base.js') {
 
 	getTop(c) {
 		let cap = c || 8, hcap = Math.floor(cap / 2);
-		let list = this.peer.list(), top = list.slice(0, hcap), got = {};
+		let list = this.list(), top = list.slice(0, hcap), got = {};
 		for (let i = 0; i < (cap * 2); i++) {
 			let n = Math.floor(Math.random() * (list.length - hcap)) + hcap, l = list[n];
 			if (l && !got[n]) {
