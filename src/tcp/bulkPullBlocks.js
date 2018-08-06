@@ -20,13 +20,21 @@ class frontierReq extends require('./base.js') {
 				this.destroy();
 				break;
 			} else {
-				let size = util.getBlockSize(this._data[i]) + 1, buf = Buffer.concat([
+				let size = util.getBlockSize(this._data[i]) + 1;
+				if (size > this._data.length - i) {
+					break;
+				}
+				let buf = Buffer.concat([
 					util.createHeader({type: 'publish', extensions: type}),
 					this._data.slice(i + 1, i + size)
 				]);
-				let out = new packet.Buffer(buf, {skipValidation: true}).toJson().get();
-				if (out && out.block) {
-					blocks.push(out.block);
+				try {
+					let out = new packet.Buffer(buf, {skipValidation: true}).toJson().get();
+					if (out && out.block) {
+						blocks.push(out.block);
+					}
+				} catch (e) {
+					this.emit('error', e);
 				}
 				i += size;
 			}

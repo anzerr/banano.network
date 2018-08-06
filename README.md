@@ -2,6 +2,8 @@
 ## `Intro`
 A object to interface with the banano network with NodeJS event system.
 
+npm i --save https://github.com/anzerr/banano.network.git
+
 ### `State`
 Usable in its current state see example for ways to use it.
 
