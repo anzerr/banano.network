@@ -13,11 +13,11 @@ class frontierReq extends require('./base.js') {
 
 	push(p) {
 		this._data = !this._data ? p : Buffer.concat([this._data, p]);
-		let i = 0, blocks = [];
+		let i = 0, blocks = [], done = false;
 		while (i < this._data.length) {
 			let type = this._data[i];
 			if (util.blockType(type) === 'notBlock') {
-				this.destroy();
+				done = true;
 				break;
 			} else {
 				let size = util.getBlockSize(this._data[i]) + 1;
@@ -41,6 +41,9 @@ class frontierReq extends require('./base.js') {
 		}
 		if (blocks.length !== 0) {
 			this.emit('data', blocks);
+		}
+		if (done) {
+			this.destroy();
 		}
 		this._data = this._data.slice(i, this._data.length);
 		return this;
