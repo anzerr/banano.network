@@ -21,5 +21,12 @@
     "dependencies": {
         "banano.account": "git+https://github.com/anzerr/banano.account.git",
         "banano.parser": "git+https://github.com/anzerr/banano.parser.git"
+    },
+    "devDependencies": {
+        "eslint": "^5.8.0",
+        "eslint-config-basic": "git+ssh://git@github.com/anzerr/eslintrc.git"
+    },
+    "eslintConfig": {
+        "extends": "eslint-config-basic"
     }
 }
