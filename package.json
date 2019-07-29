@@ -1,32 +1,36 @@
 {
-    "name": "banano.network",
-    "version": "1.0.1",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "init": "rm -Rf node_modules package-lock.json && npm i",
-        "commit": "git add . && git commit -m \"fast save\" && git push origin master"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/anzerr/banano.network.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/anzerr/banano.network/issues"
-    },
-    "homepage": "https://github.com/anzerr/banano.network#readme",
-    "dependencies": {
-        "banano.account": "git+https://github.com/anzerr/banano.account.git",
-        "banano.parser": "git+https://github.com/anzerr/banano.parser.git"
-    },
-    "devDependencies": {
-        "eslint": "^5.8.0",
-        "eslint-config-basic": "git+ssh://git@github.com/anzerr/eslintrc.git"
-    },
-    "eslintConfig": {
-        "extends": "eslint-config-basic"
-    }
+	"name": "banano.network",
+	"version": "1.0.1",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"init": "rm -Rf node_modules package-lock.json && npm i",
+		"commit": "git add . && git commit -m \"fast save\" && git push origin master"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:anzerr/banano.network.git"
+	},
+	"keywords": [],
+	"author": "anzerr",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/anzerr/banano.network/issues"
+	},
+	"homepage": "https://github.com/anzerr/banano.network#readme",
+	"dependencies": {
+		"banano.account": "git+https://github.com/anzerr/banano.account.git",
+		"banano.parser": "git+https://github.com/anzerr/banano.parser.git"
+	},
+	"devDependencies": {
+		"eslint": "5.11.1",
+		"eslint-config-basic": "git+ssh://git@github.com/anzerr/eslintrc.git"
+	},
+	"eslintConfig": {
+		"extends": "eslint-config-basic"
+	},
+	"engines": {
+		"node": ">= 0.10.0"
+	},
+	"types": "index.d.ts"
 }
