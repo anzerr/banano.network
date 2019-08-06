@@ -1,8 +1,11 @@
 
 ## `Intro`
-A object to interface with the banano network with NodeJS event system.
+A util to interface with the banano network with NodeJS event system.
 
-npm i --save https://github.com/anzerr/banano.network.git
+#### `Install`
+``` bash
+npm install --save git+https://github.com/anzerr/banano.network.git
+```
 
 ### `State`
 Usable in its current state see example for ways to use it.
