@@ -5,6 +5,7 @@ A util to interface with the banano network with NodeJS event system.
 #### `Install`
 ``` bash
 npm install --save git+https://github.com/anzerr/banano.network.git
+npm install --save @anzerr/banano.network
 ```
 
 ### `State`
