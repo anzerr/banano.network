@@ -19,10 +19,7 @@
 	"author": "anzerr",
 	"main": "index.js",
 	"types": "index.d.ts",
-	"scripts": {
-		"init": "rm -Rf node_modules package-lock.json && npm i",
-		"commit": "git add . && git commit -m \"fast save\" && git push origin master"
-	},
+	"scripts": {},
 	"eslintConfig": {
 		"extends": "eslint-config-basic"
 	},
