@@ -1,5 +1,7 @@
 
 ## `Intro`
+![GitHub Actions status | publish](https://github.com/anzerr/banano.network/workflows/publish/badge.svg)
+
 A util to interface with the banano network with NodeJS event system.
 
 #### `Install`
